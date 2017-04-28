@@ -4,18 +4,11 @@ first learn about  GraphQL on [official website](http://graphql.org/learn/).
 
 # Installation
 
-Using [composer](https://getcomposer.org/doc/00-intro.md):
-add `composer.json` file to your project root folder with following contents:
-```
-{
-    "require": {
-        "webonyx/graphql-php": "^0.9"
-    }
-}
-```
-and run `composer install`. 
+Using [composer](https://getcomposer.org/doc/00-intro.md), simply run:
 
-If you already have composer.json file - simply run: `composer require webonyx/graphql-php="^0.9"`
+```sh
+composer require webonyx/graphql-php
+```
 
 # Upgrading
 We try to keep library releases backwards compatible. But when breaking changes are inevitable 
@@ -89,10 +82,13 @@ $schema = new Schema([
 ]);
 
 $rawInput = file_get_contents('php://input');
+$input = json_decode($rawInput, true);
+$query = $input['query'];
+$variableValues = isset($input['variables']) ? $input['variables'] : null;
 
 try {
     $rootValue = ['prefix' => 'You said: '];
-    $result = GraphQL::execute($schema, $rawInput, $rootValue);
+    $result = GraphQL::execute($schema, $query, $rootValue, null, $variableValues);
 } catch (\Exception $e) {
     $result = [
         'error' => [
@@ -107,7 +103,7 @@ echo json_encode($result);
 Our example is ready. Try it by running:
 ```sh
 php -S localhost:8000 graphql.php
-curl http://localhost:8000 -d "query { echo(message: \"Hello World\") }"
+curl http://localhost:8000 -d '{"query": "query { echo(message: \"Hello World\") }" }'
 ```
 
 Check out the full [source code](https://github.com/webonyx/graphql-php/blob/master/examples/00-hello-world) of this example.
